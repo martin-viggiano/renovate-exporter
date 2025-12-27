@@ -19,7 +19,6 @@ func init() {
 
 var (
 	watchDir string
-	logLevel string
 
 	rootCmd = &cobra.Command{
 		Use:   "renovate-exporter",
