@@ -1,4 +1,4 @@
-package watcher
+package tailer
 
 import (
 	"bufio"
@@ -40,9 +40,16 @@ func (t *Tailer) Tail(ctx context.Context, path string) error {
 
 	tailCtx, cancel := context.WithCancel(ctx)
 
-	line := make(chan result)
-	timer := time.AfterFunc(idleTimeout, cancel)
+	// Unblock scanner on cancel
+	go func() {
+		<-tailCtx.Done()
+		f.Close()
+	}()
 
+	timer := time.AfterFunc(idleTimeout, cancel)
+	defer timer.Stop()
+
+	line := make(chan result)
 	go func() {
 		defer close(line)
 
@@ -73,7 +80,11 @@ func (t *Tailer) Tail(ctx context.Context, path string) error {
 
 	for {
 		select {
-		case result := <-line:
+		case result, ok := <-line:
+			if !ok {
+				return nil // Channel closed
+			}
+
 			if result.error != nil {
 				return result.error
 			}
@@ -85,14 +96,20 @@ func (t *Tailer) Tail(ctx context.Context, path string) error {
 
 			entry, err := logentry.Parse(result.entry)
 			if err != nil {
-				slog.Error("failed to parse line", slog.String("path", path), slog.String("err", err.Error()))
-				return err
+				slog.Warn("skipping malformed line", slog.String("path", path), slog.String("err", err.Error()))
+				continue
 			}
 
-			timer.Reset(idleTimeout) // Update IDLE deadline
+			timer.Reset(idleTimeout)
 			t.matcher.Process(entry)
 		case <-tailCtx.Done():
-			return tailCtx.Err()
+			// Parent context cancelled
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+
+			// Tail context cancelled, return nil
+			return nil
 		}
 	}
 }

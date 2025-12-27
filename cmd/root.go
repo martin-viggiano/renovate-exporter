@@ -7,6 +7,7 @@ import (
 
 	"github.com/martin-viggiano/renovate-exporter/internal/matcher"
 	"github.com/martin-viggiano/renovate-exporter/internal/registry"
+	"github.com/martin-viggiano/renovate-exporter/internal/tailer"
 	"github.com/martin-viggiano/renovate-exporter/internal/watcher"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
@@ -44,7 +45,7 @@ var (
 			matcher := matcher.NewEngine(registry)
 
 			watcher, err := watcher.NewWatcher(watchDir, func(path string) {
-				t := watcher.NewTailer(matcher)
+				t := tailer.NewTailer(matcher)
 				t.Tail(ctx, path)
 			})
 			if err != nil {
