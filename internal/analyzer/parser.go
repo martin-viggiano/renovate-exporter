@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type LogEntry struct {
+type Entry struct {
 	V          int       `json:"v"`
 	Time       time.Time `json:"time"`
 	PID        int       `json:"pid"`
@@ -16,10 +16,20 @@ type LogEntry struct {
 	Hostname   string    `json:"hostname"`
 
 	Repository string `json:"repository,omitempty"`
+
+	Stats *PullRequestStatistics `json:"stats,omitempty"`
 }
 
-func Parse(data []byte) (*LogEntry, error) {
-	le := LogEntry{}
+// PullRequestStatistics contains information about the merge requests.
+type PullRequestStatistics struct {
+	Total  int `json:"total"`
+	Open   int `json:"open"`
+	Closed int `json:"closed"`
+	Merged int `json:"merged"`
+}
+
+func Parse(data []byte) (*Entry, error) {
+	le := Entry{}
 
 	if err := json.Unmarshal(data, &le); err != nil {
 		return nil, err

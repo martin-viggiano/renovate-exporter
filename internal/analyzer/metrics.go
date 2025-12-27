@@ -8,16 +8,24 @@ import (
 
 type Metrics struct {
 	Repositories *prometheus.GaugeVec
+	PullRequests *prometheus.GaugeVec
 }
 
 func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 	m := &Metrics{
-		prometheus.NewGaugeVec(
+		Repositories: prometheus.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "renovate_repositories",
 				Help: "Current number of repositories being watched by Renovate.",
 			},
 			[]string{"repository"},
+		),
+		PullRequests: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "renovate_pull_requests_total",
+				Help: "Current number of Pull Requests being managed by Renovate.",
+			},
+			[]string{"repository", "state"},
 		),
 	}
 

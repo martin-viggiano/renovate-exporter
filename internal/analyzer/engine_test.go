@@ -18,11 +18,11 @@ func TestEngine(t *testing.T) {
 	engine, err := analyzer.NewEngine(reg, []analyzer.Matcher{
 		&matcherMock{
 			name: "all",
-			predicate: func(e *analyzer.LogEntry) bool {
+			predicate: func(e *analyzer.Entry) bool {
 				matched[e.Message] = struct{}{}
 				return true
 			},
-			extract: func(e *analyzer.LogEntry, metrics analyzer.Metrics) {
+			extract: func(e *analyzer.Entry, metrics analyzer.Metrics) {
 				extracted[e.Message] = struct{}{}
 			},
 		},
@@ -38,18 +38,18 @@ func TestEngine(t *testing.T) {
 
 type matcherMock struct {
 	name      string
-	predicate func(e *analyzer.LogEntry) bool
-	extract   func(e *analyzer.LogEntry, metrics analyzer.Metrics)
+	predicate func(e *analyzer.Entry) bool
+	extract   func(e *analyzer.Entry, metrics analyzer.Metrics)
 }
 
 func (m *matcherMock) Name() string {
 	return m.name
 }
 
-func (m *matcherMock) Predicate(e *analyzer.LogEntry) bool {
+func (m *matcherMock) Predicate(e *analyzer.Entry) bool {
 	return m.predicate(e)
 }
 
-func (m *matcherMock) Extract(e *analyzer.LogEntry, metrics analyzer.Metrics) {
+func (m *matcherMock) Extract(e *analyzer.Entry, metrics analyzer.Metrics) {
 	m.extract(e, metrics)
 }

@@ -20,13 +20,13 @@ func TestParse(t *testing.T) {
 	tt := []struct {
 		name         string
 		data         []byte
-		wantLogEntry *LogEntry
+		wantLogEntry *Entry
 		wantErr      error
 	}{
 		{
 			name: "ok",
 			data: []byte(`{"name":"renovate","hostname":"22111cc51078","pid":96,"level":20,"logContext":"ONCgiIpqZXDiRnCN_3XnS","msg":"Checking for config file in config.js","time":"2025-12-23T22:22:46.922Z","v":0}`),
-			wantLogEntry: &LogEntry{
+			wantLogEntry: &Entry{
 				V:          0,
 				Time:       mustParseTime("2025-12-23T22:22:46.922Z"),
 				PID:        96,

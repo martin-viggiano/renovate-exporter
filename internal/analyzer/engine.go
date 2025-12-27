@@ -8,13 +8,13 @@ import (
 
 type Matcher interface {
 	Name() string
-	Predicate(e *LogEntry) bool
-	Extract(e *LogEntry, m Metrics)
+	Predicate(e *Entry) bool
+	Extract(e *Entry, m Metrics)
 }
 
 type Skipper struct {
 	Name      string
-	Predicate func(*LogEntry) bool
+	Predicate func(*Entry) bool
 }
 
 type Engine struct {
