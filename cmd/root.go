@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
 	"github.com/martin-viggiano/renovate-exporter/internal/fswatch"
@@ -46,8 +47,12 @@ var (
 			matcher := analyzer.NewEngine(registry)
 
 			watcher, err := fswatch.New(watchDir, func(ctx context.Context, path string) {
-				t := reader.NewReader(func(ctx context.Context, data []byte) error {
+				lineFn := func(ctx context.Context, data []byte) error {
 					return matcher.Process(data)
+				}
+
+				t := reader.NewReader(lineFn, reader.Options{
+					IdleTimeout: time.Minute,
 				})
 
 				t.Tail(ctx, path)
