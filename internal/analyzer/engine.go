@@ -31,7 +31,6 @@ func NewEngine(reg *prometheus.Registry, matchers []Matcher) (*Engine, error) {
 
 	return &Engine{
 		metrics:  m,
-		skippers: buildSkippers(m),
 		matchers: matchers,
 	}, nil
 }
