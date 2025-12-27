@@ -43,10 +43,16 @@ var (
 
 			matcher := matcher.NewEngine(registry)
 
-			watcher := watcher.NewWatcher(matcher)
+			watcher, err := watcher.NewWatcher(watchDir, func(path string) {
+				t := watcher.NewTailer(matcher)
+				t.Tail(ctx, path)
+			})
+			if err != nil {
+				return err
+			}
 
 			slog.Info("watching directory", slog.String("path", watchDir))
-			return watcher.Watch(ctx, watchDir)
+			return watcher.Watch(ctx)
 		},
 	}
 )
