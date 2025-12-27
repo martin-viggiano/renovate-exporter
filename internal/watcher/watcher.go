@@ -14,10 +14,10 @@ type Watcher struct {
 	watcher   *fsnotify.Watcher
 	path      string
 	files     map[string]struct{}
-	newFileFn func(path string)
+	newFileFn func(ctx context.Context, path string)
 }
 
-func NewWatcher(path string, onNewFile func(path string)) (*Watcher, error) {
+func NewWatcher(path string, onNewFile func(ctx context.Context, path string)) (*Watcher, error) {
 	w := &Watcher{
 		files:     make(map[string]struct{}),
 		path:      path,
@@ -39,7 +39,7 @@ func (w *Watcher) Close() error {
 }
 
 // addRecursive walks the given path and starts monitoring any subdirectories.
-func (w *Watcher) addRecursive(ctx context.Context, path string) error {
+func (w *Watcher) addRecursive(path string) error {
 	return filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return w.watcher.Add(path)
@@ -57,7 +57,7 @@ func (w *Watcher) newFilesFromDir(ctx context.Context, path string) error {
 			return w.watcher.Add(path)
 		}
 
-		go w.newFileFn(path)
+		go w.newFileFn(ctx, path)
 
 		return nil
 	})
@@ -73,7 +73,7 @@ func (w *Watcher) Watch(ctx context.Context) error {
 	}
 
 	// [fsnotify.Watcher.Add] is not recursive, so we add any subdirectory to the watcher.
-	if err := w.addRecursive(ctx, w.path); err != nil {
+	if err := w.addRecursive(w.path); err != nil {
 		slog.Error("failed to add subdirectories to watcher", slog.String("path", w.path), slog.String("err", err.Error()))
 		return err
 	}
@@ -99,7 +99,7 @@ func (w *Watcher) Watch(ctx context.Context) error {
 				continue
 			}
 
-			go w.newFileFn(event.Name)
+			go w.newFileFn(ctx, event.Name)
 		case <-ctx.Done():
 			return ctx.Err()
 		}

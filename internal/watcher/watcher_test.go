@@ -1,6 +1,7 @@
 package watcher
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,7 +17,7 @@ func TestWatcher(t *testing.T) {
 
 	files := map[string]struct{}{}
 
-	newFileFn := func(path string) {
+	newFileFn := func(ctx context.Context, path string) {
 		files[path] = struct{}{}
 	}
 

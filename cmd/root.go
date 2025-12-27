@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -44,7 +45,7 @@ var (
 
 			matcher := matcher.NewEngine(registry)
 
-			watcher, err := watcher.NewWatcher(watchDir, func(path string) {
+			watcher, err := watcher.NewWatcher(watchDir, func(ctx context.Context, path string) {
 				t := tailer.NewTailer(matcher)
 				t.Tail(ctx, path)
 			})
