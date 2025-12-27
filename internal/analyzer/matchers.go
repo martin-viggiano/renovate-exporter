@@ -1,4 +1,4 @@
-package matcher
+package analyzer
 
 import "github.com/martin-viggiano/renovate-exporter/internal/registry"
 

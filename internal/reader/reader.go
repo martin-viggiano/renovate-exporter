@@ -1,4 +1,4 @@
-package tailer
+package reader
 
 import (
 	"bufio"
@@ -6,9 +6,6 @@ import (
 	"log/slog"
 	"os"
 	"time"
-
-	"github.com/martin-viggiano/renovate-exporter/internal/logentry"
-	"github.com/martin-viggiano/renovate-exporter/internal/matcher"
 )
 
 const (
@@ -20,17 +17,17 @@ type result struct {
 	error error
 }
 
-type Tailer struct {
-	matcher *matcher.Engine
+type Reader struct {
+	processLineFunc func(ctx context.Context, data []byte) error
 }
 
-func NewTailer(matcher *matcher.Engine) *Tailer {
-	return &Tailer{
-		matcher: matcher,
+func NewReader(processLineFunc func(ctx context.Context, data []byte) error) *Reader {
+	return &Reader{
+		processLineFunc: processLineFunc,
 	}
 }
 
-func (t *Tailer) Tail(ctx context.Context, path string) error {
+func (t *Reader) Tail(ctx context.Context, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		slog.Error("failed to open file", slog.String("path", path), slog.String("error", err.Error()))
@@ -94,14 +91,13 @@ func (t *Tailer) Tail(ctx context.Context, path string) error {
 				return nil
 			}
 
-			entry, err := logentry.Parse(result.entry)
+			timer.Reset(idleTimeout)
+
+			err := t.processLineFunc(ctx, result.entry)
 			if err != nil {
-				slog.Warn("skipping malformed line", slog.String("path", path), slog.String("err", err.Error()))
+				slog.Warn("error wile processing line", slog.String("path", path), slog.String("err", err.Error()))
 				continue
 			}
-
-			timer.Reset(idleTimeout)
-			t.matcher.Process(entry)
 		case <-tailCtx.Done():
 			// Parent context cancelled
 			if ctx.Err() != nil {

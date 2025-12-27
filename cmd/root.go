@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/martin-viggiano/renovate-exporter/internal/matcher"
+	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
+	"github.com/martin-viggiano/renovate-exporter/internal/fswatch"
+	"github.com/martin-viggiano/renovate-exporter/internal/reader"
 	"github.com/martin-viggiano/renovate-exporter/internal/registry"
-	"github.com/martin-viggiano/renovate-exporter/internal/tailer"
-	"github.com/martin-viggiano/renovate-exporter/internal/watcher"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
 )
@@ -43,10 +43,13 @@ var (
 				return err
 			}
 
-			matcher := matcher.NewEngine(registry)
+			matcher := analyzer.NewEngine(registry)
 
-			watcher, err := watcher.NewWatcher(watchDir, func(ctx context.Context, path string) {
-				t := tailer.NewTailer(matcher)
+			watcher, err := fswatch.New(watchDir, func(ctx context.Context, path string) {
+				t := reader.NewReader(func(ctx context.Context, data []byte) error {
+					return matcher.Process(data)
+				})
+
 				t.Tail(ctx, path)
 			})
 			if err != nil {

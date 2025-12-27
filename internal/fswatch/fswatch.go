@@ -1,4 +1,4 @@
-package watcher
+package fswatch
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type Watcher struct {
 	newFileFn func(ctx context.Context, path string)
 }
 
-func NewWatcher(path string, onNewFile func(ctx context.Context, path string)) (*Watcher, error) {
+func New(path string, onNewFile func(ctx context.Context, path string)) (*Watcher, error) {
 	w := &Watcher{
 		files:     make(map[string]struct{}),
 		path:      path,

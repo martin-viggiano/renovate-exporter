@@ -1,4 +1,4 @@
-package logentry
+package analyzer
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package watcher
+package fswatch
 
 import (
 	"context"
@@ -21,7 +21,7 @@ func TestWatcher(t *testing.T) {
 		files[path] = struct{}{}
 	}
 
-	watcher, err := NewWatcher(tmpDir, newFileFn)
+	watcher, err := New(tmpDir, newFileFn)
 	require.NoError(t, err)
 
 	errCh := make(chan error)
