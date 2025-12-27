@@ -1,4 +1,4 @@
-package registry
+package analyzer
 
 import (
 	"testing"
@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegistry(t *testing.T) {
+func TestMetrics(t *testing.T) {
 	reg := prometheus.NewRegistry()
 
-	registry, err := New(reg)
+	registry, err := newMetrics(reg)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, registry)

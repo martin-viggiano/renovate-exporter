@@ -14,6 +14,8 @@ type LogEntry struct {
 	LogContext string    `json:"logContext"`
 	Level      int       `json:"level"`
 	Hostname   string    `json:"hostname"`
+
+	Repository string `json:"repository,omitempty"`
 }
 
 func Parse(data []byte) (*LogEntry, error) {

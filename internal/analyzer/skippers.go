@@ -1,7 +1,5 @@
 package analyzer
 
-import "github.com/martin-viggiano/renovate-exporter/internal/registry"
-
-func buildSkippers(reg *registry.Registry) []Skipper {
+func buildSkippers(reg *Metrics) []Skipper {
 	return []Skipper{}
 }

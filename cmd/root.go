@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
+	"github.com/martin-viggiano/renovate-exporter/internal/analyzer/matchers"
 	"github.com/martin-viggiano/renovate-exporter/internal/fswatch"
 	"github.com/martin-viggiano/renovate-exporter/internal/reader"
-	"github.com/martin-viggiano/renovate-exporter/internal/registry"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -72,12 +72,12 @@ var (
 				}
 			}()
 
-			registry, err := registry.New(reg)
+			matchers := matchers.DefaultMatchers()
+
+			matcher, err := analyzer.NewEngine(reg, matchers)
 			if err != nil {
 				return err
 			}
-
-			matcher := analyzer.NewEngine(registry)
 
 			watcher, err := fswatch.New(watchDir, func(ctx context.Context, path string) {
 				lineFn := func(ctx context.Context, data []byte) error {
