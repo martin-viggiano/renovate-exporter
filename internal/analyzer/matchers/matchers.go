@@ -7,6 +7,7 @@ func DefaultMatchers() []analyzer.Matcher {
 		NewRepositoryStatusMatcher(),
 		NewRepositoryDurationMatcher(),
 		NewPullRequestMatcher(),
+		NewLibYearMatcher(),
 	}
 }
 
