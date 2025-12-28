@@ -4,7 +4,8 @@ import "github.com/martin-viggiano/renovate-exporter/internal/analyzer"
 
 func DefaultMatchers() []analyzer.Matcher {
 	return []analyzer.Matcher{
-		NewRepositoryMatcher(),
+		NewRepositoryStatusMatcher(),
+		NewRepositoryDurationMatcher(),
 		NewPullRequestMatcher(),
 	}
 }

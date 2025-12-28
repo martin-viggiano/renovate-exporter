@@ -1,14 +1,13 @@
 package analyzer
 
 import (
-	"errors"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type Metrics struct {
-	Repositories *prometheus.GaugeVec
-	PullRequests *prometheus.GaugeVec
+	Repositories       *prometheus.GaugeVec
+	RepositoryDuration *prometheus.GaugeVec
+	PullRequests       *prometheus.GaugeVec
 }
 
 func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
@@ -17,6 +16,13 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 			prometheus.GaugeOpts{
 				Name: "renovate_repositories",
 				Help: "Current number of repositories being watched by Renovate.",
+			},
+			[]string{"repository", "status"},
+		),
+		RepositoryDuration: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "renovate_repositories_duration_seconds",
+				Help: "Duration of the job for each of the repositories being watched by Renovate.",
 			},
 			[]string{"repository"},
 		),
@@ -29,9 +35,9 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 		),
 	}
 
-	var err error
-	err = errors.Join(err, reg.Register(m.Repositories))
-	err = errors.Join(err, reg.Register(m.PullRequests))
+	reg.MustRegister(m.Repositories)
+	reg.MustRegister(m.RepositoryDuration)
+	reg.MustRegister(m.PullRequests)
 
-	return m, err
+	return m, nil
 }
