@@ -23,6 +23,8 @@ type Entry struct {
 
 	RawStats json.RawMessage `json:"stats,omitempty"`
 
+	LibYearStatistics *LibYearStatistics `json:"libYears,omitempty"`
+
 	PullRequestStatistics *PullRequestStatistics `json:"-"`
 }
 
@@ -32,4 +34,10 @@ type PullRequestStatistics struct {
 	Open   int `json:"open"`
 	Closed int `json:"closed"`
 	Merged int `json:"merged"`
+}
+
+// LibYearStatistics contains information about the lib-year statistics.
+type LibYearStatistics struct {
+	Total    float64            `json:"total"`
+	Managers map[string]float64 `json:"managers"`
 }
