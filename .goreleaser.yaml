@@ -8,6 +8,9 @@ git:
 
 project_name: "renovate-exporter"
 
+nightly:
+  version_template: "{{ incminor .Version}}-nightly"
+
 before:
   hooks:
     - go mod tidy
@@ -30,7 +33,7 @@ dockers:
       - exporter
     goarch: amd64
     image_templates:
-      - "renovate-exporter:{{ .Version }}"
+      - "martinvigg/renovate-exporter:{{ .Version }}"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
