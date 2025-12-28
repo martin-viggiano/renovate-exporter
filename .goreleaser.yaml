@@ -25,6 +25,21 @@ archives:
       - "exporter"
     formats: [tar.gz]
 
+dockers:
+  - ids:
+      - exporter
+    goarch: amd64
+    image_templates:
+      - "renovate-exporter:{{ .Version }}"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+
 release:
   prerelease: auto
 
