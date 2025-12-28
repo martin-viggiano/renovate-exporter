@@ -29,7 +29,9 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 		),
 	}
 
-	err := errors.Join(reg.Register(m.Repositories))
+	var err error
+	err = errors.Join(err, reg.Register(m.Repositories))
+	err = errors.Join(err, reg.Register(m.PullRequests))
 
 	return m, err
 }

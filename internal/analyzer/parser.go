@@ -17,7 +17,9 @@ type Entry struct {
 
 	Repository string `json:"repository,omitempty"`
 
-	Stats *PullRequestStatistics `json:"stats,omitempty"`
+	RawStats json.RawMessage `json:"stats,omitempty"`
+
+	PullRequestStatistics *PullRequestStatistics `json:"-"`
 }
 
 // PullRequestStatistics contains information about the merge requests.
@@ -29,11 +31,23 @@ type PullRequestStatistics struct {
 }
 
 func Parse(data []byte) (*Entry, error) {
-	le := Entry{}
+	e := Entry{}
 
-	if err := json.Unmarshal(data, &le); err != nil {
+	if err := json.Unmarshal(data, &e); err != nil {
 		return nil, err
 	}
 
-	return &le, nil
+	if e.RawStats != nil {
+		switch e.Message {
+		case "Renovate repository PR statistics":
+			var s PullRequestStatistics
+			if err := json.Unmarshal(e.RawStats, &s); err != nil {
+				return nil, err
+			}
+
+			e.PullRequestStatistics = &s
+		}
+	}
+
+	return &e, nil
 }
