@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,8 +17,11 @@ func TestWatcher(t *testing.T) {
 	require.NoError(t, os.Mkdir(filepath.Join(tmpDir, "subdir"), os.ModePerm), "must be able to create a subdirectory")
 
 	files := map[string]struct{}{}
+	filesMu := sync.RWMutex{}
 
 	newFileFn := func(ctx context.Context, path string) {
+		filesMu.Lock()
+		defer filesMu.Unlock()
 		files[path] = struct{}{}
 	}
 
@@ -43,6 +47,8 @@ func TestWatcher(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		filesMu.RLock()
+		defer filesMu.RUnlock()
 		_, ok := files[filepath.Join(tmpDir, "file1.log")]
 		return ok
 	}, 5*time.Second, 100*time.Millisecond)
@@ -57,6 +63,8 @@ func TestWatcher(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		filesMu.RLock()
+		defer filesMu.RUnlock()
 		_, ok := files[filepath.Join(tmpDir, "subdir", "file2.log")]
 		return ok
 	}, 5*time.Second, 100*time.Millisecond)
@@ -72,6 +80,8 @@ func TestWatcher(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		filesMu.RLock()
+		defer filesMu.RUnlock()
 		_, ok := files[filepath.Join(tmpDir, "subdir2", "file3.log")]
 		return ok
 	}, 5*time.Second, 100*time.Millisecond)
@@ -86,6 +96,8 @@ func TestWatcher(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		filesMu.RLock()
+		defer filesMu.RUnlock()
 		_, ok := files[filepath.Join(tmpDir, "subdir2", "file4.log")]
 		return ok
 	}, 5*time.Second, 100*time.Millisecond)

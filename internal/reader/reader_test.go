@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"sync"
 	"testing"
 	"time"
 
@@ -18,8 +19,11 @@ func TestReader(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	lines := [][]byte{}
+	linesMu := sync.RWMutex{}
 
 	lineFn := func(ctx context.Context, data []byte) error {
+		linesMu.Lock()
+		defer linesMu.Unlock()
 		lines = append(lines, data)
 
 		return nil
@@ -53,6 +57,8 @@ func TestReader(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		linesMu.RLock()
+		defer linesMu.RUnlock()
 		return slices.ContainsFunc(lines, func(line []byte) bool {
 			return bytes.Equal(line, []byte("line 1"))
 		})
@@ -69,6 +75,8 @@ func TestReader(t *testing.T) {
 	}
 
 	assert.Never(t, func() bool {
+		linesMu.RLock()
+		defer linesMu.RUnlock()
 		return slices.ContainsFunc(lines, func(line []byte) bool {
 			return bytes.Equal(line, []byte("line 2 not complete"))
 		})
@@ -84,6 +92,8 @@ func TestReader(t *testing.T) {
 	}
 
 	assert.Eventually(t, func() bool {
+		linesMu.RLock()
+		defer linesMu.RUnlock()
 		return slices.ContainsFunc(lines, func(line []byte) bool {
 			return bytes.Equal(line, []byte("line 2 not complete completed"))
 		})
