@@ -30,7 +30,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         if: ${{ startsWith(github.ref, 'refs/tags/v') }} # only on tags
         with:
-          distribution: goreleaser
+          distribution: goreleaser-pro
           version: "~> v2"
           args: release --clean
         env:
@@ -39,7 +39,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }} # on main
         with:
-          distribution: goreleaser
+          distribution: goreleaser-pro
           version: "~> v2"
           args: release --nightly --clean
         env:
