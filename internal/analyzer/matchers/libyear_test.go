@@ -1,6 +1,7 @@
 package matchers_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
@@ -21,6 +22,9 @@ func TestLibYearMatcher(t *testing.T) {
 	engine, err := analyzer.NewEngine(reg, matchers)
 	require.NoError(t, err)
 
+	data, err := os.ReadFile("testdata/repository_libyears.txt")
+	require.NoError(t, err)
+
 	// Set metric for same repository and different status.
 	engine.Metrics().RepositoryLibyears.WithLabelValues("test", "unknown").Set(1)
 
@@ -28,7 +32,7 @@ func TestLibYearMatcher(t *testing.T) {
 		engine.Metrics().RepositoryLibyears.WithLabelValues("test", "unknown"),
 	))
 
-	err = engine.Process([]byte(`{"name":"renovate","hostname":"5d4f86fd4030","pid":173,"level":20,"logContext":"f63eb89c-1099-4bc3-b7b4-745eb6f6f3ba","repository":"test","libYears":{"managers":{"gitlabci":0,"gomod":3.347419393708777,"renovate-config-presets":0},"total":3.347419393708777},"dependencyStatus":{"outdated":5,"total":19},"msg":"Repository libYears","time":"2025-12-28T00:56:16.223Z","v":0}`))
+	err = engine.Process(data)
 	assert.NoError(t, err)
 
 	assert.Equal(t, float64(0), testutil.ToFloat64(

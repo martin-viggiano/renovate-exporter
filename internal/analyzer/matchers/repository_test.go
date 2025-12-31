@@ -1,6 +1,7 @@
 package matchers_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
@@ -21,6 +22,9 @@ func TestRepositoryStatusMatcher(t *testing.T) {
 	engine, err := analyzer.NewEngine(reg, matchers)
 	require.NoError(t, err)
 
+	data, err := os.ReadFile("testdata/repository_finished.txt")
+	require.NoError(t, err)
+
 	// Set metric for same repository and different status.
 	engine.Metrics().Repositories.WithLabelValues("test/repos", "unknown").Set(1)
 
@@ -28,7 +32,7 @@ func TestRepositoryStatusMatcher(t *testing.T) {
 		engine.Metrics().Repositories.WithLabelValues("test/repos", "unknown"),
 	))
 
-	err = engine.Process([]byte(`{"name":"renovate","hostname":"5d4f86fd4030","pid":20,"level":30,"logContext":"da05cd78-e34e-4bf2-b1a9-c9b6aae13710","repository":"test/repos","cloned":true,"durationMs":19174,"status":"onboarding","enabled":true,"onboarded":false,"msg":"Repository finished","time":"2025-12-28T00:15:36.757Z","v":0}`))
+	err = engine.Process(data)
 	assert.NoError(t, err)
 
 	assert.Equal(t, float64(1), testutil.ToFloat64(

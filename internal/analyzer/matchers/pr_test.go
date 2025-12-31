@@ -1,6 +1,7 @@
 package matchers_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/martin-viggiano/renovate-exporter/internal/analyzer"
@@ -21,7 +22,10 @@ func TestPullRequestMatcher(t *testing.T) {
 	engine, err := analyzer.NewEngine(reg, matchers)
 	require.NoError(t, err)
 
-	err = engine.Process([]byte(`{"name":"renovate","hostname":"22111cc51078","pid":96,"level":20,"logContext":"4b569c43-f97c-43eb-ae32-443e49ca1b89","repository":"test","stats":{"total":7,"open":3,"closed":4,"merged":0},"msg":"Renovate repository PR statistics","time":"2025-12-23T22:23:16.987Z","v":0}`))
+	data, err := os.ReadFile("testdata/repository_pr_statistics.txt")
+	require.NoError(t, err)
+
+	err = engine.Process(data)
 	assert.NoError(t, err)
 
 	assert.Equal(t, float64(3), testutil.ToFloat64(

@@ -1,0 +1,1 @@
+{"name":"renovate","hostname":"22111cc51078","pid":96,"level":20,"logContext":"4b569c43-f97c-43eb-ae32-443e49ca1b89","repository":"test","stats":{"total":7,"open":3,"closed":4,"merged":0},"msg":"Renovate repository PR statistics","time":"2025-12-23T22:23:16.987Z","v":0}
