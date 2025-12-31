@@ -21,6 +21,12 @@ builds:
     binary: renovate-exporter
     goos: [linux]
     goarch: [amd64]
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
 
 archives:
   - id: "archive"
