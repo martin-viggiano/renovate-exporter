@@ -8,6 +8,8 @@ func DefaultMatchers() []analyzer.Matcher {
 		NewRepositoryDurationMatcher(),
 		NewPullRequestMatcher(),
 		NewLibYearMatcher(),
+		NewDependencyCountMatcher(),
+		NewDependencyFilesMatcher(),
 	}
 }
 

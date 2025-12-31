@@ -20,6 +20,13 @@ func Parse(data []byte) (*Entry, error) {
 			}
 
 			e.PullRequestStatistics = &s
+		case "Dependency extraction complete":
+			var s ManagerStatistics
+			if err := json.Unmarshal(e.RawStats, &s); err != nil {
+				return nil, err
+			}
+
+			e.ManagerStatistics = &s
 		}
 	}
 

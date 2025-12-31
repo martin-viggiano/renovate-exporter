@@ -5,10 +5,12 @@ import (
 )
 
 type Metrics struct {
-	Repositories       *prometheus.GaugeVec
-	RepositoryDuration *prometheus.GaugeVec
-	RepositoryLibyears *prometheus.GaugeVec
-	PullRequests       *prometheus.GaugeVec
+	Repositories         *prometheus.GaugeVec
+	RepositoryDuration   *prometheus.GaugeVec
+	RepositoryLibyears   *prometheus.GaugeVec
+	PullRequests         *prometheus.GaugeVec
+	DependenciesTotal    *prometheus.GaugeVec
+	DependencyFilesTotal *prometheus.GaugeVec
 }
 
 func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
@@ -41,12 +43,28 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 			},
 			[]string{"repository", "state"},
 		),
+		DependenciesTotal: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "renovate_dependencies_total",
+				Help: "Total number of dependencies per repository and manager discovered by Renovate.",
+			},
+			[]string{"repository", "manager"},
+		),
+		DependencyFilesTotal: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "renovate_dependency_files_total",
+				Help: "Number of dependency files per repository and manager discovered by Renovate.",
+			},
+			[]string{"repository", "manager"},
+		),
 	}
 
 	reg.MustRegister(m.Repositories)
 	reg.MustRegister(m.RepositoryDuration)
 	reg.MustRegister(m.RepositoryLibyears)
 	reg.MustRegister(m.PullRequests)
+	reg.MustRegister(m.DependenciesTotal)
+	reg.MustRegister(m.DependencyFilesTotal)
 
 	return m, nil
 }
