@@ -73,6 +73,7 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 	reg.MustRegister(m.PullRequests)
 	reg.MustRegister(m.DependenciesTotal)
 	reg.MustRegister(m.DependencyFilesTotal)
+	reg.MustRegister(m.DependencyOutdatedTotal)
 
 	return m, nil
 }

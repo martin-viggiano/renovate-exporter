@@ -10,6 +10,7 @@ func DefaultMatchers() []analyzer.Matcher {
 		NewLibYearMatcher(),
 		NewDependencyCountMatcher(),
 		NewDependencyFilesMatcher(),
+		NewOutdatedDependencyMatcher(),
 	}
 }
 
