@@ -230,6 +230,88 @@ sum(renovate_pull_requests_total{state="merged"}) /
    sum(renovate_pull_requests_total{state="closed"}))
 ```
 
+---
+
+### `renovate_dependencies_total`
+
+**Type:** Gauge  
+**Description:** Total number of dependencies per repository and package manager discovered by Renovate.
+
+**Labels:**
+
+- `repository` - Repository name
+- `manager` - Package manager (e.g., `npm`, `gomod`, `docker`, `pip`)
+
+**Example PromQL:**
+
+```promql
+# Total dependencies across all repositories
+sum(renovate_dependencies_total)
+
+# Dependencies by package manager
+sum by (manager) (renovate_dependencies_total)
+
+# Repositories with the most dependencies
+topk(10, sum by (repository) (renovate_dependencies_total))
+
+# Average dependencies per repository
+avg(sum by (repository) (renovate_dependencies_total))
+```
+
+---
+
+### `renovate_dependency_files_total`
+
+**Type:** Gauge  
+**Description:** Number of dependency files per repository and package manager discovered by Renovate.
+
+**Labels:**
+
+- `repository` - Repository name
+- `manager` - Package manager (e.g., `npm`, `gomod`, `docker`, `pip`)
+
+**Example PromQL:**
+
+```promql
+# Total dependency files across all repositories
+sum(renovate_dependency_files_total)
+
+# Dependency files by package manager
+sum by (manager) (renovate_dependency_files_total)
+
+# Repositories with multiple package.json files
+renovate_dependency_files_total{manager="npm"} > 1
+```
+
+---
+
+### `renovate_dependency_outdated_total`
+
+**Type:** Gauge  
+**Description:** Total number of outdated dependencies per repository and package manager that have available updates.
+
+**Labels:**
+
+- `repository` - Repository name
+- `manager` - Package manager (e.g., `npm`, `gomod`, `docker`, `pip`)
+
+**Example PromQL:**
+
+```promql
+# Total outdated dependencies across all repositories
+sum(renovate_dependency_outdated_total)
+
+# Outdated dependencies by package manager
+sum by (manager) (renovate_dependency_outdated_total)
+
+# Repositories with the most outdated dependencies
+topk(10, sum by (repository) (renovate_dependency_outdated_total))
+
+# Percentage of outdated dependencies per repository
+(sum by (repository) (renovate_dependency_outdated_total) / 
+ sum by (repository) (renovate_dependencies_total)) * 100
+```
+
 ## Usage Examples
 
 ### Prometheus Scrape Configuration
