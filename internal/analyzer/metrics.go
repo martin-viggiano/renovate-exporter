@@ -5,12 +5,13 @@ import (
 )
 
 type Metrics struct {
-	Repositories         *prometheus.GaugeVec
-	RepositoryDuration   *prometheus.GaugeVec
-	RepositoryLibyears   *prometheus.GaugeVec
-	PullRequests         *prometheus.GaugeVec
-	DependenciesTotal    *prometheus.GaugeVec
-	DependencyFilesTotal *prometheus.GaugeVec
+	Repositories            *prometheus.GaugeVec
+	RepositoryDuration      *prometheus.GaugeVec
+	RepositoryLibyears      *prometheus.GaugeVec
+	PullRequests            *prometheus.GaugeVec
+	DependenciesTotal       *prometheus.GaugeVec
+	DependencyFilesTotal    *prometheus.GaugeVec
+	DependencyOutdatedTotal *prometheus.GaugeVec
 }
 
 func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
@@ -54,6 +55,13 @@ func newMetrics(reg *prometheus.Registry) (*Metrics, error) {
 			prometheus.GaugeOpts{
 				Name: "renovate_dependency_files_total",
 				Help: "Number of dependency files per repository and manager discovered by Renovate.",
+			},
+			[]string{"repository", "manager"},
+		),
+		DependencyOutdatedTotal: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "renovate_dependency_outdated_total",
+				Help: "Total number of outdated dependencies per repository and manager discovered by Renovate.",
 			},
 			[]string{"repository", "manager"},
 		),

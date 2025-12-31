@@ -30,5 +30,14 @@ func Parse(data []byte) (*Entry, error) {
 		}
 	}
 
+	if e.RawConfig != nil && e.Message == "packageFiles with updates" {
+		var config PackageFilesConfig
+		if err := json.Unmarshal(e.RawConfig, &config.Managers); err != nil {
+			return nil, err
+		}
+
+		e.PackageFilesConfig = &config
+	}
+
 	return &e, nil
 }
